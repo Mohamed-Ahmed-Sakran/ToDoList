@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ToDoList.Dtos;
-using ToDoList.Services;
+using System.Security.Claims;
+using System.Text.Json;
+using ToDoList.Core.Dtos;
+using ToDoList.Core.Repositories;
 
 namespace ToDoList.Controllers
 {
@@ -13,11 +15,16 @@ namespace ToDoList.Controllers
     [ApiVersion("2.0")]
     public class MissionController : ControllerBase
     {
-        private readonly IMissionService _missionService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public MissionController(IMissionService missionService)
+        private readonly IMapper _mapper;
+        private readonly ILogger<MissionController> logger;
+
+        public MissionController(IUnitOfWork unitOfWork, IMapper mapper, ILogger<MissionController> logger)
         {
-            _missionService = missionService;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+            this.logger = logger;
         }
 
         [HttpGet("{userId}")]
@@ -28,8 +35,14 @@ namespace ToDoList.Controllers
 
             try
             {
-                var Missions = await _missionService.GetAsync(userId);
-                return Ok(Missions);
+                await IsValidUserAsync(userId);
+
+                logger.LogInformation($"Now finished check user with id = {userId} and start getting allMission for him");
+
+                var Missions = await _unitOfWork.missions.FindAllAsync(m => m.UserId == userId);
+
+                var missionsDto = _mapper.Map<IEnumerable<MissionDto>>(Missions);
+                return Ok(missionsDto);
             }
             catch (Exception ex)
             {
@@ -38,14 +51,16 @@ namespace ToDoList.Controllers
         }
 
         [HttpGet("{userId}/{missionDueDate}")]
-        public async Task<IActionResult> GetAllMission(string userId , DateTime missionDueDate)
+        public async Task<IActionResult> GetAllMission(string userId, DateTime missionDueDate)
         {
             if (string.IsNullOrEmpty(userId) || missionDueDate == DateTime.MinValue)
                 return BadRequest("There is an error in data");
 
             try
             {
-                var Missions = await _missionService.GetAsync(userId,missionDueDate);
+                await IsValidUserAsync(userId);
+
+                var Missions = await _unitOfWork.missions.GetMissionsByUserAndDueDateAsync(userId, missionDueDate);
                 return Ok(Missions);
             }
             catch (Exception ex)
@@ -55,18 +70,25 @@ namespace ToDoList.Controllers
         }
 
         [HttpPost("{userId}")]
-        public async Task<IActionResult> AddMission(string userId , [FromBody] MissionDto missionDto)
+        public async Task<IActionResult> AddMission(string userId, [FromBody] MissionDto missionDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if (string.IsNullOrEmpty(userId) || missionDto is null)
                 return BadRequest("There is an error in data");
 
             try
             {
-                var Missions = await _missionService.AddAsync(userId,missionDto);
-                return Ok(Missions);
+                await IsValidUserAsync(userId);
+
+                var Mission = await _unitOfWork.missions.AddAsync(userId, missionDto);
+                await _unitOfWork.CompleteAsync();
+                return Ok(Mission);
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, ex.Message);
                 return BadRequest(ex.Message);
             }
         }
@@ -79,7 +101,11 @@ namespace ToDoList.Controllers
 
             try
             {
-                var Missions = await _missionService.UpdateAsync(missionId, missionDto);
+                await IsHaveAccessToMissionAsync(missionId);
+
+                var Missions = await _unitOfWork.missions.UpdateAsync(missionId, missionDto);
+                await _unitOfWork.CompleteAsync();
+
                 return Ok(Missions);
             }
             catch (Exception ex)
@@ -96,12 +122,106 @@ namespace ToDoList.Controllers
 
             try
             {
-                var Missions = await _missionService.DeleteAsync(missionId);
-                return Ok(Missions);
+                await IsHaveAccessToMissionAsync(missionId);
+
+                var Mission = await _unitOfWork.missions.DeleteAsync(m => m.Id == missionId);
+                await _unitOfWork.CompleteAsync();
+                return Ok(Mission);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("updateStatue/{missionId}")]
+        public async Task<IActionResult> CompleteMission(int missionId)
+        {
+            Console.WriteLine("where is an error ?");
+
+            if (missionId <= 0)
+                return BadRequest("There is an error in data");
+
+            try
+            {
+                await IsHaveAccessToMissionAsync(missionId);
+
+                var Mission = await _unitOfWork.missions.CompleteAsync(missionId);
+                await _unitOfWork.CompleteAsync();
+                return Ok(Mission);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("Completed/{userId}")]
+        public async Task<IActionResult> GetCompletedMission(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("There is an error in data");
+
+            try
+            {
+                await IsValidUserAsync(userId);
+
+                var Missions = await _unitOfWork.missions.FindAllAsync(m => m.UserId == userId & m.IsCompleted == true);
+
+                var missionsDto = _mapper.Map<IEnumerable<MissionDto>>(Missions);
+                return Ok(missionsDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("Non-Completed/{userId}")]
+        public async Task<IActionResult> GetNonCompletedMission(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("There is an error in data");
+
+            try
+            {
+                await IsValidUserAsync(userId);
+
+                var Missions = await _unitOfWork.missions.FindAllAsync(m => m.UserId == userId & m.IsCompleted == false);
+
+                var missionsDto = _mapper.Map<IEnumerable<MissionDto>>(Missions);
+                return Ok(missionsDto);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        private async Task IsValidUserAsync(string userId)
+        {
+            await _unitOfWork.users.IsUserFoundAsync(userId);
+
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(currentUserId) || currentUserId != userId)
+            {
+                logger.LogWarning("This user with id: {currentUser} is want to access another user with id: {requestUserId}",currentUserId,userId);
+                throw new UnauthorizedAccessException("You can only manage your own missions");
+            }
+        }
+
+        private async Task IsHaveAccessToMissionAsync(int missionId)
+        {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            bool checkAccessMission = await _unitOfWork.missions.CheckAccessToMissionAsync(currentUserId, missionId);
+
+            if (!checkAccessMission)
+            {
+                logger.LogWarning("This user with id: {currentUser} is want to access mission with id: {missionId} for another user",currentUserId,missionId);
+                throw new Exception("Sorry! you don't have an access to this mission");
             }
         }
 

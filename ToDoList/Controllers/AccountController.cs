@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ToDoList.Dtos;
+using System.Security.Claims;
+using ToDoList.Core.Dtos;
 using ToDoList.Services;
 
 namespace ToDoList.Controllers
@@ -14,11 +14,13 @@ namespace ToDoList.Controllers
     {
         private readonly IAccountService _accountService;
         private readonly IAccountAdminService _accountAdminService;
+        private readonly ILogger<AccountController> logger;
 
-        public AccountController(IAccountService accountService, IAccountAdminService accountAdminService)
+        public AccountController(IAccountService accountService, IAccountAdminService accountAdminService,ILogger<AccountController> logger)
         {
             _accountService = accountService;
             _accountAdminService = accountAdminService;
+            this.logger = logger;
         }
 
         [Authorize(Roles = "Moderator")]
@@ -33,6 +35,8 @@ namespace ToDoList.Controllers
             }
             catch (Exception ex)
             {
+                var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                logger.LogError("There is an error when account with id: {id} try to get all participate accounts", id);
                 return BadRequest(ex.Message);
             }
         }
@@ -97,41 +101,11 @@ namespace ToDoList.Controllers
             if (!authResult.IsAuthenticated)
                 return BadRequest(authResult.Message);
 
+            if (!string.IsNullOrEmpty(authResult.RefreshToken))
+                setRefreshTokenInCookie(authResult.RefreshToken, authResult.RefreshTokenExpiration);
+
             return Ok(authResult);
         }
-
-        //[HttpPost("Login")]
-        //[MapToApiVersion("1.0")]
-        //public async Task<IActionResult> LoginV1([FromBody] LoginDto loginDto)
-        //{
-        //    if (loginDto is null)
-        //        return BadRequest("There is an error in data");
-
-        //    var authResult = await _accountService.LoginV1Async(loginDto);
-
-        //    if (!authResult.IsAuthenticated)
-        //        return BadRequest(authResult.Message);
-
-        //    return Ok(authResult);
-        //}
-
-        //[HttpPost("Login")]
-        //[MapToApiVersion("2.0")]
-        //public async Task<IActionResult> LoginV2([FromBody] LoginDto loginDto)
-        //{
-        //    if (loginDto is null)
-        //        return BadRequest("There is an error in data");
-
-        //    var authResult = await _accountService.LoginV2Async(loginDto);
-
-        //    if (authResult is null)
-        //        return BadRequest("Unexpected error occurred");
-
-        //    if (!authResult.IsAuthenticated)
-        //        return BadRequest(authResult.Message);
-
-        //    return Ok(authResult);
-        //}
 
         [Authorize(Roles = "Moderator")]
         [HttpPost("Roles")]
@@ -149,6 +123,7 @@ namespace ToDoList.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, ex.Message);
                 return BadRequest(ex.Message);
             }
         }
@@ -169,6 +144,7 @@ namespace ToDoList.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, ex.Message);
                 return BadRequest(ex.Message);
             }
         }
@@ -195,6 +171,7 @@ namespace ToDoList.Controllers
         [HttpPut("Block/{userId}/{NumOfDayBlock}")]
         [MapToApiVersion("1.0")]
         [MapToApiVersion("2.0")]
+        [Authorize(Roles = "Moderator,Admin")]
         public async Task<IActionResult> BlockUser(string userId , int NumOfDayBlock)
         {
             if (string.IsNullOrEmpty(userId) || NumOfDayBlock <= 0)
@@ -207,6 +184,7 @@ namespace ToDoList.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, ex.Message);
                 return BadRequest(ex.Message);
             }
         }
@@ -214,6 +192,7 @@ namespace ToDoList.Controllers
         [HttpPut("Unblock/{userId}")]
         [MapToApiVersion("1.0")]
         [MapToApiVersion("2.0")]
+        [Authorize(Roles = "Moderator,Admin")]
         public async Task<IActionResult> UnblockUser(string userId)
         {
             if (string.IsNullOrEmpty(userId))
@@ -245,8 +224,52 @@ namespace ToDoList.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, ex.Message);
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("refreshToken")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            var result = await _accountService.RefreshTokenAsync(refreshToken);
+
+            if (!result.IsAuthenticated)
+                return BadRequest(result);
+
+            setRefreshTokenInCookie(result.RefreshToken, result.RefreshTokenExpiration);
+
+            return Ok(result);
+        }
+
+        [HttpPost("revokeToken")]
+        public async Task<IActionResult> RevokeToken([FromBody] RevokeTokenDto modelDto)
+        {
+            var Token = modelDto.Token ?? Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrEmpty(Token))
+                return BadRequest("Token is required");
+
+            var result = await _accountService.RevokeTokenAsync(Token);
+
+            if(!result)
+                return BadRequest("Token is invalid");
+
+            return Ok();
+        }
+
+        private void setRefreshTokenInCookie(string refreshToken , DateTime expires)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = expires.ToLocalTime()
+            };
+
+            Response.Cookies.Append("refreshToken",refreshToken, cookieOptions);
+        }
+
     }
 }

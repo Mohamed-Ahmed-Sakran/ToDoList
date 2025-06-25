@@ -1,0 +1,17 @@
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\obj\Debug\net8.0\ToDoList.EF.csproj.AssemblyReference.cache
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\obj\Debug\net8.0\ToDoList.EF.GeneratedMSBuildEditorConfig.editorconfig
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\obj\Debug\net8.0\ToDoList.EF.AssemblyInfoInputs.cache
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\obj\Debug\net8.0\ToDoList.EF.AssemblyInfo.cs
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\obj\Debug\net8.0\ToDoList.EF.csproj.CoreCompileInputs.cache
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\bin\Debug\net8.0\ToDoList.EF.deps.json
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\bin\Debug\net8.0\ToDoList.EF.runtimeconfig.json
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\bin\Debug\net8.0\ToDoList.EF.dll
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\bin\Debug\net8.0\ToDoList.EF.pdb
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\bin\Debug\net8.0\ToDoList.Core.dll
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\bin\Debug\net8.0\ToDoList.Core.pdb
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\obj\Debug\net8.0\ToDoList.D07E1356.Up2Date
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\obj\Debug\net8.0\ToDoList.EF.dll
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\obj\Debug\net8.0\refint\ToDoList.EF.dll
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\obj\Debug\net8.0\ToDoList.EF.pdb
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\obj\Debug\net8.0\ToDoList.EF.genruntimeconfig.cache
+D:\Studying\courses\Web\2\We can go again\Roadmap\projects\API Training\ToDoList\ToDoList.EF\obj\Debug\net8.0\ref\ToDoList.EF.dll

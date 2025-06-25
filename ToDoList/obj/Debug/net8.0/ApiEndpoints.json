@@ -46,10 +46,20 @@
     "Parameters": [
       {
         "Name": "loginDto",
-        "Type": "ToDoList.Dtos.LoginDto",
+        "Type": "ToDoList.Core.Dtos.LoginDto",
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ToDoList.Controllers.AccountController",
+    "Method": "RefreshToken",
+    "RelativePath": "api/v1/Account/refreshToken",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -62,7 +72,23 @@
     "Parameters": [
       {
         "Name": "registerDto",
-        "Type": "ToDoList.Dtos.RegisterDto",
+        "Type": "ToDoList.Core.Dtos.RegisterDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ToDoList.Controllers.AccountController",
+    "Method": "RevokeToken",
+    "RelativePath": "api/v1/Account/revokeToken",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelDto",
+        "Type": "ToDoList.Core.Dtos.RevokeTokenDto",
         "IsRequired": true
       }
     ],
@@ -136,7 +162,7 @@
       },
       {
         "Name": "updateUserDto",
-        "Type": "ToDoList.Dtos.UpdateUserDto",
+        "Type": "ToDoList.Core.Dtos.UpdateUserDto",
         "IsRequired": true
       }
     ],
@@ -157,7 +183,7 @@
       },
       {
         "Name": "missionDto",
-        "Type": "ToDoList.Dtos.MissionDto",
+        "Type": "ToDoList.Core.Dtos.MissionDto",
         "IsRequired": true
       }
     ],
@@ -210,7 +236,7 @@
       },
       {
         "Name": "missionDto",
-        "Type": "ToDoList.Dtos.MissionDto",
+        "Type": "ToDoList.Core.Dtos.MissionDto",
         "IsRequired": true
       }
     ],
@@ -232,6 +258,54 @@
       {
         "Name": "missionDueDate",
         "Type": "System.DateTime",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ToDoList.Controllers.MissionController",
+    "Method": "GetCompletedMission",
+    "RelativePath": "api/v1/Mission/Completed/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ToDoList.Controllers.MissionController",
+    "Method": "GetNonCompletedMission",
+    "RelativePath": "api/v1/Mission/Non-Completed/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ToDoList.Controllers.MissionController",
+    "Method": "CompleteMission",
+    "RelativePath": "api/v1/Mission/updateStatue/{missionId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "missionId",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
@@ -294,10 +368,20 @@
     "Parameters": [
       {
         "Name": "loginDto",
-        "Type": "ToDoList.Dtos.LoginDto",
+        "Type": "ToDoList.Core.Dtos.LoginDto",
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ToDoList.Controllers.AccountController",
+    "Method": "RefreshToken",
+    "RelativePath": "api/v2/Account/refreshToken",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {
@@ -310,7 +394,23 @@
     "Parameters": [
       {
         "Name": "registerDto",
-        "Type": "ToDoList.Dtos.RegisterDto",
+        "Type": "ToDoList.Core.Dtos.RegisterDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ToDoList.Controllers.AccountController",
+    "Method": "RevokeToken",
+    "RelativePath": "api/v2/Account/revokeToken",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelDto",
+        "Type": "ToDoList.Core.Dtos.RevokeTokenDto",
         "IsRequired": true
       }
     ],
@@ -384,7 +484,7 @@
       },
       {
         "Name": "updateUserDto",
-        "Type": "ToDoList.Dtos.UpdateUserDto",
+        "Type": "ToDoList.Core.Dtos.UpdateUserDto",
         "IsRequired": true
       }
     ],
@@ -405,7 +505,7 @@
       },
       {
         "Name": "missionDto",
-        "Type": "ToDoList.Dtos.MissionDto",
+        "Type": "ToDoList.Core.Dtos.MissionDto",
         "IsRequired": true
       }
     ],
@@ -458,7 +558,7 @@
       },
       {
         "Name": "missionDto",
-        "Type": "ToDoList.Dtos.MissionDto",
+        "Type": "ToDoList.Core.Dtos.MissionDto",
         "IsRequired": true
       }
     ],
@@ -486,24 +586,51 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "ToDoList.Controllers.WeatherForecastController",
-    "Method": "Get",
-    "RelativePath": "WeatherForecast",
+    "ContainingType": "ToDoList.Controllers.MissionController",
+    "Method": "GetCompletedMission",
+    "RelativePath": "api/v2/Mission/Completed/{userId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
+    "Parameters": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[ToDoList.WeatherForecast, ToDoList, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
+        "Name": "userId",
+        "Type": "System.String",
+        "IsRequired": true
       }
     ],
-    "EndpointName": "GetWeatherForecast"
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ToDoList.Controllers.MissionController",
+    "Method": "GetNonCompletedMission",
+    "RelativePath": "api/v2/Mission/Non-Completed/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ToDoList.Controllers.MissionController",
+    "Method": "CompleteMission",
+    "RelativePath": "api/v2/Mission/updateStatue/{missionId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "missionId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

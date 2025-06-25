@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using ToDoList.Dtos;
-using ToDoList.Models;
+using ToDoList.Core.Dtos;
+using ToDoList.Core.Models;
 
 namespace ToDoList.Helpers
 {
@@ -31,7 +31,8 @@ namespace ToDoList.Helpers
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.DueDate, opt => opt.MapFrom(src => src.DueDate))
-                .ForMember(dest => dest.IsCompleted, opt => opt.MapFrom(src => src.IsCompleted));
+                .ForMember(dest => dest.IsCompleted, opt => opt.MapFrom(src => src.IsCompleted))
+                .ReverseMap();
             
         }
     }
